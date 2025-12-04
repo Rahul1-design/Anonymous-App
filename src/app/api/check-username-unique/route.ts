@@ -54,7 +54,7 @@ export async function GET(request: Request) {
         success: true,
         message: "Username is unique",
       },
-      { status: 400 }
+      { status: 200 }
     );
   } catch (error) {
     console.log("Error checking username", error);
