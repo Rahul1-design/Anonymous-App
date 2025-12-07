@@ -1,23 +1,27 @@
 "use client"
 
-import { signIn, signOut, useSession } from "next-auth/react"
+import { useDebounceValue } from 'usehooks-ts'
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z  from "zod"
+import Link from "next/link"
+import { useState } from "react"
+import { toast } from "sonner"
+import { useRouter } from 'next/navigation'
 
-export default function Component() {
+const page = () => {
+    const [username, setUsername] = useState('');
+    const [usernameMessage, setUsernamemessage] = useState('')
+    const [isCheckingUsername, setIsCheckingUsername] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const debouncedUsername = useDebounceValue(username, 300)
+    const router = useRouter()
 
-    // useSession = A React hook that tells you if someone is logged in and who they are
-    const { data: session } = useSession()
-    if (session) {
-        return (
-            <>
-                Signed in as {session.user.email} <br />
-                <button onClick={() => signOut()}>Sign Out</button>
-            </>
-        )
-    }
-    return (
-        <>
-            Not Signed in <br />
-            <button className="bg-orange-500 px-3 py-2 m-4 rounded-xl cursor-pointer" onClick={() => signIn()}>Sign In</button>
-        </>
-    )
+    // zod Implementation
+
+  return (
+    <div>page</div>
+  )
 }
+
+export default page
