@@ -3,10 +3,15 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 import UserModel from "@/model/User";
 import { User } from "next-auth";
 import { getServerSession } from "next-auth";
-import mongoose from "mongoose";
 
-export async function DELETE(request: Request, {params}: {params: {messageid: string}}) {
+export async function DELETE(
+  request: Request,
+  context: { params: Promise<{ messageid: string }> }
+) {
   await dbConnect();
+  
+  // Await the params
+  const params = await context.params;
   const messageId = params.messageid;
 
   const session = await getServerSession(authOptions);
@@ -21,30 +26,38 @@ export async function DELETE(request: Request, {params}: {params: {messageid: st
       { status: 401 }
     );
   }
+  
   try {
     const updateResult = await UserModel.updateOne(
-      {_id: user._id},
-      {$pull: {messages: {_id: messageId}}}
-    )
+      { _id: user._id },
+      { $pull: { messages: { _id: messageId } } }
+    );
+    
     if (updateResult.modifiedCount == 0) {
-      return Response.json({
-        success: false,
-        message: "Message not found or already delete"
-      }, {status: 404})
+      return Response.json(
+        {
+          success: false,
+          message: "Message not found or already deleted",
+        },
+        { status: 404 }
+      );
     }
+    
     return Response.json(
       {
         success: true,
-        message: "Message Deleted"
-      }, {status: 200}
-    )
+        message: "Message Deleted",
+      },
+      { status: 200 }
+    );
   } catch (error) {
-    console.log("Error in delete message route", error)
-    return Response.json({
-      success: false,
-      message: "Error deleting message"
-    }, {status: 500})
+    console.log("Error in delete message route", error);
+    return Response.json(
+      {
+        success: false,
+        message: "Error deleting message",
+      },
+      { status: 500 }
+    );
   }
- 
-  
 }

@@ -39,34 +39,47 @@ const MessageCard = ({ message, onMessageDelete}: MessageCardProps) => {
        toast(`${response.data.message}`)
        onMessageDelete(message._id.toString())
     }
+    
+    // Format the date
+    const formattedDate = new Date(message.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    })
+    
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Card Title</CardTitle>
-                <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                        <Button variant="destructive"><X className="w-5 h-5" /></Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete your
-                                account and remove your data from our servers.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDeleteConfirm} >Continue</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-                <CardDescription>Card Description</CardDescription>
-                <CardAction>Card Action</CardAction>
+                <div className="flex justify-between items-start">
+                    <CardTitle className="flex-1">Anonymous Message</CardTitle>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="icon-sm">
+                                <X className="w-4 h-4" />
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete this
+                                    message from your account.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
+                <CardDescription>{formattedDate}</CardDescription>
             </CardHeader>
             <CardContent>
+                <p className="text-base">{message.content}</p>
             </CardContent>
-
         </Card>
     )
 }

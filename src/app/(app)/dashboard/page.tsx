@@ -44,7 +44,7 @@ const UserDashboard = () => {
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
       toast("Error", {
-        description: axiosError.response?.data.message || "Falied to fetch message settings"
+        description: axiosError.response?.data.message || "Failed to fetch message settings"
       })
     } finally {
       setIsSwitchLoading(false)
@@ -65,7 +65,7 @@ const UserDashboard = () => {
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
       toast("Error", {
-        description: axiosError.response?.data.message || "Failed to fetch message settings"
+        description: axiosError.response?.data.message || "Failed to fetch messages"
       })
     } finally {
       setIsLoading(false)
@@ -79,7 +79,7 @@ const UserDashboard = () => {
     fetchMessages()
     fetchAcceptMessage()
 
-  }, [session, setValue, fetchMessages])
+  }, [session, setValue, fetchAcceptMessage, fetchMessages])
 
   // Handle switch change
   const handleSwitchChange = async () => {
@@ -93,24 +93,29 @@ const UserDashboard = () => {
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
       toast("Error", {
-        description: axiosError.response?.data.message || "Failed to fetch message settings"
+        description: axiosError.response?.data.message || "Failed to update message settings"
       })
     }
   }
-  const { username } = session?.user as User
-  //TODO do more research 
-  const baseUrl = `${window.location.protocol}//${window.location.host}`
+
+  // Early return if no session
+  if (!session || !session.user) {
+    return <div className="flex justify-center items-center min-h-screen">
+      <Loader2 className="h-8 w-8 animate-spin" />
+    </div>
+  }
+
+  const user = session.user as User
+  const username = user.username || ''
+  
+  const baseUrl = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}` : ''
   const profileUrl = `${baseUrl}/u/${username}`
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(profileUrl)
     toast("URL copied", {
-      description: "Profile URL has been copied to clipboard "
+      description: "Profile URL has been copied to clipboard"
     })
-  }
-
-  if (!session || !session.user) {
-    return <div>Please Log in</div>
   }
 
   return (
@@ -124,7 +129,7 @@ const UserDashboard = () => {
             type="text"
             value={profileUrl}
             disabled
-            className="input input-bordered w-full p-2 mr-2"
+            className="input input-bordered w-full p-2 mr-2 border rounded"
           />
           <Button onClick={copyToClipboard}>Copy</Button>
         </div>
@@ -159,7 +164,7 @@ const UserDashboard = () => {
       </Button>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
         {messages.length > 0 ? (
-          messages.map((message, index) => (
+          messages.map((message) => (
             <MessageCard
               key={message._id.toString()}
               message={message}
