@@ -64,7 +64,8 @@ const page = () => {
       toast.success("Success", {
         description: response.data.message
       })
-      router.replace(`/verify/${username}`)
+      // FIX: Use data.username instead of username state
+      router.replace(`/verify/${data.username}`)
       setIsSubmitting(false)
     } catch (error) {
       console.log("Error in signup of user", error)
@@ -102,7 +103,7 @@ const page = () => {
                   </FormControl>
                     {isCheckingUsername && <Loader2 className='animate-spin' />}
                     <p className={`text-sm ${usernameMessage === "Username is unique" ? "text-green-500" : "text-red-500" }  `}>
-                        text {usernameMessage}
+                        {usernameMessage}
                     </p>
                   <FormMessage />
                 </FormItem>

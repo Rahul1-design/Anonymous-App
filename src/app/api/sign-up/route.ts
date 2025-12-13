@@ -12,6 +12,8 @@ export async function POST(request: Request){
 
         const {username, email, password} = await request.json()
 
+        console.log("Sign-up attempt with username:", username); // Debug log
+
         const existingUserVerifiedByUsername = await UserModel.findOne({
             username,
             isVerified: true
@@ -21,7 +23,7 @@ export async function POST(request: Request){
             return Response.json({
                 success: false,
                 message: "Username is already taken"
-            }, {status: 404})
+            }, {status: 400}) // Changed from 404 to 400
         }
 
         const existingUserByEmail = await UserModel.findOne({
@@ -36,11 +38,13 @@ export async function POST(request: Request){
                     message: "User already exist with this email"
                 }, {status: 400})
             } else {
-                const hasedPassword = await bcrypt.hash(password, 10)
-                existingUserByEmail.password = hasedPassword;
+                const hashedPassword = await bcrypt.hash(password, 10)
+                existingUserByEmail.username = username; // Update username too
+                existingUserByEmail.password = hashedPassword;
                 existingUserByEmail.verifyCode = verifyCode;
                 existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000)
                 await existingUserByEmail.save()
+                console.log("Updated existing user:", existingUserByEmail.username); // Debug log
             }
         }
         else {
@@ -60,6 +64,7 @@ export async function POST(request: Request){
             })
 
             await newUser.save()
+            console.log("Created new user:", newUser.username, "with code:", verifyCode); // Debug log
         }
         //Send Verification Email
         const emailResponse = await sendVerificationEmail(
@@ -91,17 +96,3 @@ export async function POST(request: Request){
     )
     }
 }
-
-// This Algorithm is used 
-
-
-// If existingUserByEmail Exists THEN
-//     IF existingUSerByEmail.isVerified THEN 
-//         success: false,
-//     ELSE 
-//         //Save the updated user 
-//     END if
-// ELSE 
-//     //Create a new user with the provided details 
-//     //Save the new user
-// END IF 
